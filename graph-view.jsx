@@ -12,6 +12,8 @@ function GraphView({ selectedId, onSelect, searchQuery, activeCategories }) {
   const arrowSelRef   = React.useRef(null);
   const modeRef       = React.useRef("free");
   const initialFitRef = React.useRef(false);
+  const zoomRef       = React.useRef(null);
+  const savedZoomRef  = React.useRef(null);
 
   // ── helpers ────────────────────────────────────────────────
 
@@ -79,6 +81,7 @@ function GraphView({ selectedId, onSelect, searchQuery, activeCategories }) {
     const zoom = d3.zoom().scaleExtent([0.12,4])
       .on("zoom", e => g.attr("transform", e.transform));
     svg.call(zoom).on("dblclick.zoom", null);
+    zoomRef.current = zoom;
     const g = svg.append("g");
     gRef.current = g;
 
@@ -205,9 +208,14 @@ function GraphView({ selectedId, onSelect, searchQuery, activeCategories }) {
         .attr("stroke","#CBD5E1").attr("stroke-opacity",0.45).attr("stroke-width",1.4);
       svg.selectAll(".arrows polygon").transition().duration(300)
         .attr("fill-opacity",0);
+      if (savedZoomRef.current) {
+        svg.transition().duration(400).call(zoomRef.current.transform, savedZoomRef.current);
+        savedZoomRef.current = null;
+      }
       return;
     }
 
+    savedZoomRef.current = d3.zoomTransform(svg.node());
     modeRef.current = "radial";
     simRef.current.stop();
 
@@ -336,6 +344,20 @@ function GraphView({ selectedId, onSelect, searchQuery, activeCategories }) {
     });
     rings.attr("transform",`translate(${cx},${cy})`)
       .transition().duration(450).attr("opacity",1);
+
+    // Zoom to fit radial layout
+    const visiblePos = Object.values(positions);
+    const xs = visiblePos.map(p => p.x);
+    const ys = visiblePos.map(p => p.y);
+    const pad = 80;
+    const minX = Math.min(...xs) - pad, maxX = Math.max(...xs) + pad;
+    const minY = Math.min(...ys) - pad, maxY = Math.max(...ys) + pad;
+    const bw = maxX - minX, bh = maxY - minY;
+    const sc = Math.min(W / bw, H / bh, 2.0);
+    const ftx = W/2 - sc * (minX + bw/2);
+    const fty = H/2 - sc * (minY + bh/2);
+    svg.transition().duration(600).ease(d3.easeCubicOut)
+      .call(zoomRef.current.transform, d3.zoomIdentity.translate(ftx, fty).scale(sc));
 
   }, [selectedId]);
 
