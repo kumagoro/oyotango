@@ -11,6 +11,7 @@ function GraphView({ selectedId, onSelect, searchQuery, activeCategories }) {
   const linkSelRef    = React.useRef(null);
   const arrowSelRef   = React.useRef(null);
   const modeRef       = React.useRef("free");
+  const initialFitRef = React.useRef(false);
 
   // ── helpers ────────────────────────────────────────────────
 
@@ -168,6 +169,8 @@ function GraphView({ selectedId, onSelect, searchQuery, activeCategories }) {
       })
       .on("end", () => {
         if (modeRef.current !== "free") return;
+        if (initialFitRef.current) return;
+        initialFitRef.current = true;
         const bb = g.node().getBBox();
         if (!bb.width) return;
         const pad=60, sc=Math.min((W-pad*2)/bb.width,(H-pad*2)/bb.height,1.0);
