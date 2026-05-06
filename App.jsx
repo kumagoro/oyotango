@@ -79,6 +79,7 @@ function App() {
   }, [searchQuery, activeCategories, bookmarks, view]);
 
   const allActive = activeCategories.size === Object.keys(window.CATEGORIES).length;
+  const mobileStacked = isMobile && !!selectedTerm;
 
   return (
     <div style={appStyles.root}>
@@ -126,9 +127,9 @@ function App() {
         </nav>
       </header>
 
-      <div style={appStyles.body}>
+      <div style={{ ...appStyles.body, ...(mobileStacked ? { flexDirection: "column" } : {}) }}>
         {/* Sidebar */}
-        <aside style={{ ...appStyles.sidebar, ...(sidebarOpen ? {} : appStyles.sidebarHidden) }}>
+        <aside style={{ ...appStyles.sidebar, ...(sidebarOpen ? {} : appStyles.sidebarHidden), ...(mobileStacked ? { display: "none" } : {}) }}>
           <div style={appStyles.sidebarTitle}>
             <span>カテゴリ</span>
             {!allActive && (
@@ -163,7 +164,7 @@ function App() {
         </aside>
 
         {/* Main content */}
-        <main style={appStyles.main}>
+        <main style={{ ...appStyles.main, ...(mobileStacked ? { minHeight: 0 } : {}) }}>
           {view === "graph" && (
             <div style={appStyles.graphArea}>
               <GraphView
@@ -239,7 +240,7 @@ function App() {
         {selectedTerm && (
           <aside style={{
             ...appStyles.detailPanel,
-            ...(isMobile ? appStyles.detailPanelMobile : {}),
+            ...(isMobile ? appStyles.detailPanelMobileStacked : {}),
           }}>
             <TermDetail
               term={selectedTerm}
@@ -384,10 +385,14 @@ const appStyles = {
     boxShadow: "-2px 0 12px rgba(0,0,0,0.06)",
     overflowY: "auto",
   },
-  detailPanelMobile: {
-    position: "absolute", right: 0, top: 56, bottom: 0,
-    width: "85vw", maxWidth: 340, zIndex: 200,
-    boxShadow: "-4px 0 24px rgba(0,0,0,0.15)",
+  detailPanelMobileStacked: {
+    width: "100%",
+    height: "42vh",
+    borderLeft: "none",
+    borderBottom: "1px solid #E2E8F0",
+    boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+    flexShrink: 0,
+    order: -1,
   },
 };
 
