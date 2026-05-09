@@ -95,37 +95,60 @@ function App() {
           </div>
         </div>
 
-        <div style={appStyles.searchWrap}>
-          <span style={appStyles.searchIcon}>🔍</span>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder="用語を検索..."
-            style={appStyles.searchInput}
-          />
-          {searchQuery && (
-            <button onClick={() => setSearchQuery("")} style={appStyles.clearBtn}>✕</button>
-          )}
-        </div>
+        {!isMobile && (
+          <div style={appStyles.searchWrap}>
+            <span style={appStyles.searchIcon}>🔍</span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="用語を検索..."
+              style={appStyles.searchInput}
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery("")} style={appStyles.clearBtn}>✕</button>
+            )}
+          </div>
+        )}
 
-        <nav style={appStyles.nav}>
-          {[
-            { key: "graph", label: "グラフ", icon: "◉" },
-            { key: "list", label: "一覧", icon: "≡" },
-            { key: "bookmarks", label: `ブックマーク ${bookmarks.size > 0 ? `(${bookmarks.size})` : ""}`, icon: "★" },
-          ].map(({ key, label, icon }) => (
-            <button
-              key={key}
-              onClick={() => setView(key)}
-              style={{ ...appStyles.navBtn, ...(view === key ? appStyles.navBtnActive : {}) }}
-            >
-              <span style={{ marginRight: 4 }}>{icon}</span>
-              {!isMobile && label}
-            </button>
-          ))}
-        </nav>
+        {!isMobile && (
+          <nav style={appStyles.nav}>
+            {[
+              { key: "graph", label: "グラフ", icon: "◉" },
+              { key: "list", label: "一覧", icon: "≡" },
+              { key: "bookmarks", label: `ブックマーク ${bookmarks.size > 0 ? `(${bookmarks.size})` : ""}`, icon: "★" },
+            ].map(({ key, label, icon }) => (
+              <button
+                key={key}
+                onClick={() => setView(key)}
+                style={{ ...appStyles.navBtn, ...(view === key ? appStyles.navBtnActive : {}) }}
+              >
+                <span style={{ marginRight: 4 }}>{icon}</span>
+                {label}
+              </button>
+            ))}
+          </nav>
+        )}
       </header>
+
+      {/* Mobile-only search row */}
+      {isMobile && (
+        <div style={appStyles.mobileSearchRow}>
+          <div style={appStyles.searchWrap}>
+            <span style={appStyles.searchIcon}>🔍</span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="用語を検索..."
+              style={appStyles.searchInput}
+            />
+            {searchQuery && (
+              <button onClick={() => setSearchQuery("")} style={appStyles.clearBtn}>✕</button>
+            )}
+          </div>
+        </div>
+      )}
 
       <div style={{ ...appStyles.body, ...(mobileStacked ? { flexDirection: "column" } : {}) }}>
         {/* Sidebar */}
@@ -255,6 +278,29 @@ function App() {
           </aside>
         )}
       </div>
+
+      {/* Mobile-only bottom tab bar */}
+      {isMobile && (
+        <nav style={appStyles.mobileBottomNav}>
+          {[
+            { key: "graph", label: "グラフ", icon: "◉" },
+            { key: "list", label: "一覧", icon: "≡" },
+            { key: "bookmarks", label: "ブックマーク", icon: "★", badge: bookmarks.size },
+          ].map(({ key, label, icon, badge }) => (
+            <button
+              key={key}
+              onClick={() => setView(key)}
+              style={{ ...appStyles.mobileBottomNavBtn, ...(view === key ? appStyles.mobileBottomNavBtnActive : {}) }}
+            >
+              <span style={appStyles.mobileBottomNavIcon}>
+                {icon}
+                {badge > 0 && <span style={appStyles.mobileBottomNavBadge}>{badge}</span>}
+              </span>
+              <span style={appStyles.mobileBottomNavLabel}>{label}</span>
+            </button>
+          ))}
+        </nav>
+      )}
     </div>
   );
 }
@@ -393,6 +439,40 @@ const appStyles = {
     boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
     flexShrink: 0,
     order: -1,
+  },
+  mobileSearchRow: {
+    flexShrink: 0, padding: "8px 12px",
+    background: "#fff", borderBottom: "1px solid #E2E8F0",
+  },
+  mobileBottomNav: {
+    flexShrink: 0, display: "flex",
+    background: "#fff", borderTop: "1px solid #E2E8F0",
+    boxShadow: "0 -2px 8px rgba(0,0,0,0.05)",
+    height: 56,
+  },
+  mobileBottomNavBtn: {
+    flex: 1, display: "flex", flexDirection: "column",
+    alignItems: "center", justifyContent: "center", gap: 2,
+    background: "none", border: "none", cursor: "pointer",
+    color: "#94A3B8", fontFamily: "'Noto Sans JP', sans-serif",
+    transition: "color 0.15s",
+    padding: "6px 4px",
+  },
+  mobileBottomNavBtnActive: {
+    color: "#3B82F6",
+  },
+  mobileBottomNavIcon: {
+    fontSize: 20, lineHeight: 1, position: "relative",
+  },
+  mobileBottomNavBadge: {
+    position: "absolute", top: -4, right: -10,
+    background: "#F59E0B", color: "#fff",
+    fontSize: 10, fontWeight: 700,
+    padding: "1px 5px", borderRadius: 10, minWidth: 16,
+    textAlign: "center", lineHeight: 1.3,
+  },
+  mobileBottomNavLabel: {
+    fontSize: 10.5, fontWeight: 600,
   },
 };
 
