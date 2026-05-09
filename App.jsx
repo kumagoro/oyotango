@@ -8,7 +8,7 @@ const STORAGE_MEMOS = "ouyou_memos";
 function App() {
   const [selectedId, setSelectedId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [view, setView] = useState("graph"); // "graph" | "list" | "bookmarks"
+  const [view, setView] = useState("list"); // "graph" | "list" | "bookmarks"
   const [activeCategories, setActiveCategories] = useState(new Set(Object.keys(window.CATEGORIES)));
   const [bookmarks, setBookmarks] = useState(() => {
     try { return new Set(JSON.parse(localStorage.getItem(STORAGE_BOOKMARKS) || "[]")); }
@@ -307,7 +307,7 @@ function App() {
 
 const appStyles = {
   root: {
-    display: "flex", flexDirection: "column", height: "100vh", overflow: "hidden",
+    display: "flex", flexDirection: "column", height: "100dvh", overflow: "hidden",
     fontFamily: "'Noto Sans JP', sans-serif",
     background: "#F8FAFC", color: "#0F172A",
   },
@@ -449,6 +449,7 @@ const appStyles = {
     background: "#fff", borderTop: "1px solid #E2E8F0",
     boxShadow: "0 -2px 8px rgba(0,0,0,0.05)",
     height: 56,
+    paddingBottom: "env(safe-area-inset-bottom)",
   },
   mobileBottomNavBtn: {
     flex: 1, display: "flex", flexDirection: "column",
